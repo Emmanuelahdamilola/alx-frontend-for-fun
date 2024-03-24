@@ -1,0 +1,38 @@
+
+/* Style for the toggle label */
+.toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 100px;
+    height: 52px;
+    background-color: #eeeef1;
+    border-radius: 30px;
+    border: 2px solid gray;
+}
+
+.toggle-label::after{
+    content: '';
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: white;
+        top: 1px; 
+        left: 1px;
+        transition:  all 0.5s;
+        border: 2px solid gray;
+}
+/* Checkbox checked effect */
+.toggle-cb:checked + .toggle-label::after {
+    left : 49px; 
+}
+       
+/* Checkbox checked toggle label bg color */
+.toggle-cb:checked + .toggle-label {
+    background-color: red;
+}
+       
+/* Checkbox vanished */
+.toggle-cb { 
+    display : none;
+}

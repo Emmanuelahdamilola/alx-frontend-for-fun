@@ -1,0 +1,91 @@
+/* 3-styles.css */
+
+/* Reset default styles */
+body,
+html {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style for the menu */
+.menu {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50px;
+    align-items: center;
+    margin-top: 20px;
+
+}
+
+/* Hide the checkbox */
+.menu-open {
+    display: none;
+}
+
+/* Style for the menu button */
+.menu-open-button {
+    cursor: pointer;
+    background-color: #d11212;
+    border: none;
+    outline: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    color: white;
+    transition: 0.3s ease;
+}
+
+.menu-open-button:hover {
+    transform: scale(1.2);
+}
+
+/* Style for the menu lines */
+.menu-line {
+    display: block;
+    width: 30px;
+    height: 2px;
+    background-color: #fff;
+    margin: 6px 0;
+    transition: transform 0.3s, opacity 0.3s;
+
+}
+
+/* Animation for opening the menu */
+.menu-open:checked+.menu-open-button .menu-line-1 {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-open:checked+.menu-open-button .menu-line-2 {
+    opacity: 0;
+}
+
+.menu-open:checked+.menu-open-button .menu-line-3 {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Style for menu items */
+.menu-item {
+    text-decoration: none;
+    font-size: 18px;
+    margin: 10px 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+    background-color: #d11212;
+    color: white;
+    padding: 16px;
+    border-radius: 50%;
+}
+
+.menu-item:hover {
+    background-color: white;
+    color: #d11212;
+    border: 2px solid #d11212;
+}
+
+/* Animation for menu items */
+.menu-open:checked~.menu-item {
+    opacity: 1;
+    transition-delay: 0.3s;
+}
