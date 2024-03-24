@@ -1,0 +1,51 @@
+/* 0-styles.css */
+
+/* Reset default list styles */
+ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    
+}
+ul li{
+    border: 2px solid gray;
+    margin-right: 10px;
+    text-align: center;
+    display: block;
+    justify-content: center;
+    font-size: 35px;
+    font-weight: bolder;
+    border-radius: 10px;
+    margin-top: 0;
+    width: 320px; 
+    height: 450px; 
+    background-color: ghostwhite;
+    padding-top: 20px;
+}
+
+
+/* Set the dimensions for the icons */
+.icon {
+    display: inline-block;
+    width: 320px; 
+    height: 400px; 
+    background-image: url('0-sprite.png'); /* Path to your sprite image */
+    background-repeat: no-repeat;
+    border-radius: 40px;
+}
+
+/* Set the background position for HTML icon */
+.icon.i-html {
+    background-position: 0 0; /* Position of HTML icon in the sprite */
+}
+
+/* Set the background position for CSS icon */
+.icon.i-css {
+    background-position: -290px 0; /* Position of CSS icon in the sprite */
+}
+
+/* Set the background position for JavaScript icon */
+.icon.i-js {
+    background-position: -580px 0; /* Position of JavaScript icon in the sprite */
+}
