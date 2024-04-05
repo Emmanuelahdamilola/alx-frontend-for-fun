@@ -1,0 +1,16 @@
+/* Color variable in sass */
+$color-var:#3D3D3D;
+$background:#6D6D6D;
+
+body {
+	color: $color-var;
+	background-color: $background;
+}
+p{
+	color: $color-var;
+}
+h2{
+	background-color: $background;
+}
+
+
