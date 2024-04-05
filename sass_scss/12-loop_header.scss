@@ -2,6 +2,6 @@
 
 @for $i from 1 through 6 {
 	h#{$i} {
-		font-size: #{$i}px;
+		font-size: $i * 1px;
 	}
 }
