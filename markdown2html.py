@@ -11,7 +11,7 @@ import os.path
 
 def main():
     if len(sys.argv) != 3:
-        sys.stderr.write("Usage: ./markdown2html.py <input_file.md> <output_file.html>\n")
+        sys.stderr.write("Usage: ./markdown2html.py <README.md> <README.html>\n")
         sys.exit(1)
 
     input_file = sys.argv[1]
