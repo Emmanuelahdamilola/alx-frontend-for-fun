@@ -21,7 +21,7 @@ def convert_heading(match):
 
 def convert_ordered_list(match):
     """
-    Converts Markdown unordered list syntax to HTML.
+    Converts Markdown ordered list syntax to HTML.
     Example: "- Hello" -> "<li>Hello</li>"
     """
     global ol_open
@@ -31,6 +31,17 @@ def convert_ordered_list(match):
         return f"<ol>\n    <li>{list_item}</li>"
     else:
         return f"    <li>{list_item}</li>"
+
+def close_ordered_list(match):
+    """
+    Closes the ordered list tag if it was opened.
+    """
+    global ol_open
+    if ol_open:
+        ol_open = False
+        return "</ol>"
+    else:
+        return ""
 
 def main():
     global ol_open
@@ -55,7 +66,7 @@ def main():
     html_content = re.sub(r"^(#{1,6})\s+(.+)$", convert_heading, markdown_content, flags=re.MULTILINE)
 
     # Convert Markdown ordered lists to HTML
-    html_content = re.sub(r"^\s*-\s+(.+)$", convert_ordered_list, html_content, flags=re.MULTILINE)
+    html_content = re.sub(r"(?<=\n)- (.+)(?=\n\n|$)", convert_ordered_list, html_content, flags=re.MULTILINE)
 
     # Close the <ol> tag if it was opened
     if ol_open:
