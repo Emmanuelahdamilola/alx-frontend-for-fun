@@ -2,16 +2,27 @@
 """
 Converts a Markdown file to an HTML file.
 
-Usage: ./markdown2html.py README.md README.html
+Usage: ./markdown2html.py <input_file.md> <output_file.html>
 """
+
 
 import sys
 import os.path
+import re
 
+
+def convert_heading(match):
+    """
+    Converts Markdown heading syntax to HTML.
+    Example: "# Heading level 1" -> "<h1>Heading level 1</h1>"
+    """
+    heading_level = len(match.group(1))
+    heading_text = match.group(2)
+    return f"<h{heading_level}>{heading_text}</h{heading_level}>"
 
 def main():
     if len(sys.argv) != 3:
-        sys.stderr.write("Usage: ./markdown2html.py <README.md> <README.html>\n")
+        sys.stderr.write("Usage: ./markdown2html.py <input_file.md> <output_file.html>\n")
         sys.exit(1)
 
     input_file = sys.argv[1]
@@ -21,7 +32,16 @@ def main():
         sys.stderr.write(f"Missing {input_file}\n")
         sys.exit(1)
 
-    # Conversion logic (not implemented in this example)
+    # Read the input Markdown file
+    with open(input_file, "r") as md_file:
+        markdown_content = md_file.read()
+
+    # Convert Markdown headings to HTML
+    html_content = re.sub(r"^(#{1,6})\s+(.+)$", convert_heading, markdown_content, flags=re.MULTILINE)
+
+    # Write the HTML content to the output file
+    with open(output_file, "w") as html_file:
+        html_file.write(html_content)
 
     sys.exit(0)
 
