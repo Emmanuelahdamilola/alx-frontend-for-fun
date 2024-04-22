@@ -5,7 +5,6 @@ Converts a Markdown file to an HTML file.
 Usage: ./markdown2html.py <input_file.md> <output_file.html>
 """
 
-
 import sys
 import os.path
 import re
@@ -25,10 +24,18 @@ def convert_unordered_list(match):
     Converts Markdown unordered list syntax to HTML.
     Example: "- Hello" -> "<li>Hello</li>"
     """
+    global ul_open
     list_item = match.group(1)
-    return f"<li>{list_item}</li>"
+    if not ul_open:
+        ul_open = True
+        return f"<ul>\n    <li>{list_item}</li>"
+    else:
+        return f"    <li>{list_item}</li>"
 
 def main():
+    global ul_open
+    ul_open = False
+    
     if len(sys.argv) != 3:
         sys.stderr.write("Usage: ./markdown2html.py <input_file.md> <output_file.html>\n")
         sys.exit(1)
@@ -50,12 +57,15 @@ def main():
     # Convert Markdown unordered lists to HTML
     html_content = re.sub(r"^\s*-\s+(.+)$", convert_unordered_list, html_content, flags=re.MULTILINE)
 
+    # Close the <ul> tag if it was opened
+    if ul_open:
+        html_content += "</ul>\n"
+
     # Write the HTML content to the output file
     with open(output_file, "w") as html_file:
         html_file.write(html_content)
 
     sys.exit(0)
-
 
 
 if __name__ == "__main__":
