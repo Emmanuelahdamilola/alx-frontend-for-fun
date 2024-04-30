@@ -1,83 +1,102 @@
 #!/usr/bin/python3
-"""
-Converts a Markdown file to an HTML file.
 
-Usage: ./markdown2html.py <input_file.md> <output_file.html>
 """
-
+Markdown to HTML conversion script written in Python.
+"""
 import sys
 import os.path
 import re
+import hashlib
 
 
-def convert_heading(match):
-    """
-    Converts Markdown heading syntax to HTML.
-    Example: "# Heading level 1" -> "<h1>Heading level 1</h1>"
-    """
-    heading_level = len(match.group(1))
-    heading_text = match.group(2)
-    return f"<h{heading_level}>{heading_text}</h{heading_level}>"
+if __name__ == '__main__':
+    # Check if input arguments are provided
+    if len(sys.argv) < 3:
+        print('Usage: ./markdown2html.py README.md README.html', file=sys.stderr)
+        exit(1)
 
-def convert_ordered_list(match):
-    """
-    Converts Markdown ordered list syntax to HTML.
-    Example: "- Hello" -> "<li>Hello</li>"
-    """
-    global ol_open
-    list_item = match.group(1)
-    if not ol_open:
-        ol_open = True
-        return f"<ol>\n    <li>{list_item}</li>"
-    else:
-        return f"    <li>{list_item}</li>"
+    # Check if input markdown file exists
+    if not os.path.isfile(sys.argv[1]):
+        print('Missing {}'.format(sys.argv[1]), file=sys.stderr)
+        exit(1)
 
-def close_ordered_list(match):
-    """
-    Closes the ordered list tag if it was opened.
-    """
-    global ol_open
-    if ol_open:
-        ol_open = False
-        return "</ol>"
-    else:
-        return ""
+    with open(sys.argv[1]) as read:
+        with open(sys.argv[2], 'w') as html:
+            # Initialize flags for different Markdown syntax elements
+            unordered_start, ordered_start, paragraph = False, False, False
 
-def main():
-    global ol_open
-    ol_open = False
-    
-    if len(sys.argv) != 3:
-        sys.stderr.write("Usage: ./markdown2html.py <input_file.md> <output_file.html>\n")
-        sys.exit(1)
+            # Iterate through each line of the input Markdown file
+            for line in read:
+                # Replace Markdown bold and italic syntax with HTML tags
+                line = line.replace('**', '<b>', 1)
+                line = line.replace('**', '</b>', 1)
+                line = line.replace('__', '<em>', 1)
+                line = line.replace('__', '</em>', 1)
 
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
+                # Extract text within [[...]] and replace it with MD5 hash
+                md5 = re.findall(r'\[\[.+?\]\]', line)
+                md5_inside = re.findall(r'\[\[(.+?)\]\]', line)
+                if md5:
+                    line = line.replace(md5[0], hashlib.md5(md5_inside[0].encode()).hexdigest())
 
-    if not os.path.isfile(input_file):
-        sys.stderr.write(f"Missing {input_file}\n")
-        sys.exit(1)
+                # Remove occurrences of the letter 'C' or 'c' within double parentheses
+                remove_letter_c = re.findall(r'\(\(.+?\)\)', line)
+                remove_c_more = re.findall(r'\(\((.+?)\)\)', line)
+                if remove_letter_c:
+                    remove_c_more = ''.join(c for c in remove_c_more[0] if c not in 'Cc')
+                    line = line.replace(remove_letter_c[0], remove_c_more)
 
-    # Read the input Markdown file
-    with open(input_file, "r") as md_file:
-        markdown_content = md_file.read()
+                # Calculate the length of the line and strip relevant characters
+                length = len(line)
+                headings = line.lstrip('#')
+                heading_num = length - len(headings)
+                unordered = line.lstrip('-')
+                unordered_num = length - len(unordered)
+                ordered = line.lstrip('*')
+                ordered_num = length - len(ordered)
 
-    # Convert Markdown headings to HTML
-    html_content = re.sub(r"^(#{1,6})\s+(.+)$", convert_heading, markdown_content, flags=re.MULTILINE)
+                # Handle Markdown headings and lists
+                if 1 <= heading_num <= 6:
+                    line = '<h{}>'.format(heading_num) + headings.strip() + '</h{}>\n'.format(heading_num)
 
-    # Convert Markdown ordered lists to HTML
-    html_content = re.sub(r"(?<=\n)- (.+)(?=\n\n|$)", convert_ordered_list, html_content, flags=re.MULTILINE)
+                if unordered_num:
+                    if not unordered_start:
+                        html.write('<ul>\n')
+                        unordered_start = True
+                    line = '<li>' + unordered.strip() + '</li>\n'
+                if unordered_start and not unordered_num:
+                    html.write('</ul>\n')
+                    unordered_start = False
 
-    # Close the <ol> tag if it was opened
-    if ol_open:
-        html_content += "</ol>\n"
+                if ordered_num:
+                    if not ordered_start:
+                        html.write('<ol>\n')
+                        ordered_start = True
+                    line = '<li>' + ordered.strip() + '</li>\n'
+                if ordered_start and not ordered_num:
+                    html.write('</ol>\n')
+                    ordered_start = False
 
-    # Write the HTML content to the output file
-    with open(output_file, "w") as html_file:
-        html_file.write(html_content)
+                if not (heading_num or unordered_start or ordered_start):
+                    if not paragraph and length > 1:
+                        html.write('<p>\n')
+                        paragraph = True
+                    elif length > 1:
+                        html.write('<br/>\n')
+                    elif paragraph:
+                        html.write('</p>\n')
+                        paragraph = False
 
-    sys.exit(0)
+                if length > 1:
+                    html.write(line)
 
+            # Close any open HTML tags at the end of the file
+            if unordered_start:
+                html.write('</ul>\n')
+            if ordered_start:
+                html.write('</ol>\n')
+            if paragraph:
+                html.write('</p>\n')
 
-if __name__ == "__main__":
-    main()
+    exit(0)
+
